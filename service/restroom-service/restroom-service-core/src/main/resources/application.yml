@@ -1,5 +1,5 @@
 server:
-  port: 20000
+  port: 30000
   error:
     includeException: true
     includeStacktrace: ON_PARAM
@@ -12,6 +12,29 @@ spring:
     nacos:
       discovery:
         server-addr: 20.50.54.194:8848
+        metadata:
+          myname: ryan
+          mylover: wy
+        # 起别名，代替application name
+#        service: restroom-service
+        # 心跳间隔时间
+        heart-beat-interval: 5000
+        # 服务器踢出的事件（标记不健康），默认15s,如果想服务器尽快踢出不健康的实例，时间可以设置短些
+        heart-beat-timeout: 15000
+        # 防止意外宕机的防范措施
+#        naming-load-cache-at-start: false
+#        cluster-name: Cluster-2
+#        namespace: a6eb9a92-9092-41ea-8902-c9907a7103cc
+#        group: myGroup
+#        # 是否向nacos发起服务注册,服务发现功能还在
+#        register-enabled: false
+#        # 监听服务端的信息变化
+#        watch:
+#          enabled: true
+#        watch-delay: 30000
+
+
+
   jpa:
     show-sql: true
     hibernate:

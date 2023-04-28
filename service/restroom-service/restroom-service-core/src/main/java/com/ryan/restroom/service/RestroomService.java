@@ -65,4 +65,5 @@ public class RestroomService implements IRestroomService {
         ToiletEntity toilet = toiletDAO.findById(id).orElseThrow(() -> new RuntimeException("Toilet not found"));
         return toilet.isAvailable();
     }
+
 }

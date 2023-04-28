@@ -10,9 +10,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,10 +41,15 @@ public class EmployeeService implements IEmployeeActivityService {
     @Autowired
     private RestTemplate        restTemplate;
 
+    @Autowired
+    private DiscoveryClient     discoveryClient;
+
     @Override
     @PostMapping("/toilet-break")
     @Transactional
     public EmployeeActivity useToilet(Long employeeId) {
+        List<ServiceInstance> instances = discoveryClient.getInstances("restroom-service");
+
         int count = employeeActivityDAO.countByEmployeeIdAndActivityTypeAndActive(employeeId, ActivityType.TOILET_BREAK, true);
         if (count > 0) {
             throw new RuntimeException("快拉！");
@@ -84,5 +93,10 @@ public class EmployeeService implements IEmployeeActivityService {
         EmployeeActivity result = new EmployeeActivity();
         BeanUtils.copyProperties(record, result);
         return result;
+    }
+
+    @GetMapping("/testRibbon")
+    public void testRibbon() {
+        restTemplate.getForObject("http://restroom-service/toilet-service/checkAvailable/", Toilet[].class);
     }
 }
