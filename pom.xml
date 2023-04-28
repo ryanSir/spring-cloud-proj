@@ -13,6 +13,10 @@
         <module>service/restroom-service/restroom-api</module>
         <module>service/restroom-service/restroom-dao</module>
         <module>service/restroom-service/restroom-service-core</module>
+        <module>service/employee-service</module>
+        <module>service/employee-service/employee-api</module>
+        <module>service/employee-service/employee-dao</module>
+        <module>service/employee-service/employee-service-core</module>
     </modules>
 
     <properties>
