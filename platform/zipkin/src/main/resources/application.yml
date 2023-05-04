@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: zipkin-server
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 20.50.54.194:8848
+    main:
+      allow-bean-definition-overriding: true
+
+server:
+  port: 30000

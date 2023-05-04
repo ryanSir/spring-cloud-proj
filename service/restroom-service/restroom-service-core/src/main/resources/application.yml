@@ -1,5 +1,5 @@
 server:
-  port: 30000
+  port: 20000
   compression:
     enabled: true
   error:
@@ -16,6 +16,14 @@ spring:
       probability: 1
       # 每秒最多采样100个trace
       rate: 100
+  zipkin:
+    sender:
+      type: web
+    discovery-client-enabled: true
+    base-url: http://zipkin-server
+    locator:
+      discovery:
+        enabled: true
 
   cloud:
     nacos:
@@ -68,6 +76,7 @@ spring:
       pool-name: DateSourceHikariCP   # 连接池名字
       max-lifetime: 1800000           # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认:30分钟 1800000ms
       connection-test-query: SELECT 1
+
 
 management:
   endpoint:

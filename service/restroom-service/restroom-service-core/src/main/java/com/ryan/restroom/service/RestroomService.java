@@ -30,6 +30,7 @@ public class RestroomService implements IRestroomService {
     @Override
     @GetMapping("/checkAvailable")
     public List<Toilet> getAvailableToilet() {
+        log.info("checkAvailable");
         List<ToiletEntity> result = toiletDAO.findAllByCleanAndAvailable(true, true);
         return result.stream().map(ToiletConverter::convert).collect(Collectors.toList());
     }
@@ -37,6 +38,7 @@ public class RestroomService implements IRestroomService {
     @Override
     @PostMapping("/occupy")
     public Toilet occupy(Long id) {
+
         ToiletEntity toilet = toiletDAO.findById(id).orElseThrow(() -> new RuntimeException("Toilet not found"));
 
         if (!toilet.isAvailable() || !toilet.isClean()) {
@@ -75,6 +77,7 @@ public class RestroomService implements IRestroomService {
     @GetMapping("/testZip")
     public Toilet testZip(String input) {
         log.info("test testZip,id={}", 3);
-        return Toilet.builder().desc(input).build();
+//        return Toilet.builder().desc(input).build();
+        return null;
     }
 }

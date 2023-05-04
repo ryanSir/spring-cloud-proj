@@ -54,6 +54,7 @@ public class EmployeeService implements IEmployeeActivityService {
     @PostMapping("/toilet-break")
     @Transactional
     public EmployeeActivity useToilet(Long employeeId) {
+        log.info("employee service - toilet-break");
         List<ServiceInstance> instances = discoveryClient.getInstances("restroom-service");
 
         int count = employeeActivityDAO.countByEmployeeIdAndActivityTypeAndActive(employeeId, ActivityType.TOILET_BREAK, true);
@@ -61,7 +62,7 @@ public class EmployeeService implements IEmployeeActivityService {
             throw new RuntimeException("快拉！");
         }
         // 发起远程调用
-        //        Toilet[] toilets = restTemplate.getForObject("http://restroom-service/toilet-service/checkAvailable/", Toilet[].class);
+//                Toilet[] toilets = restTemplate.getForObject("http://restroom-service/toilet-service/checkAvailable/", Toilet[].class);
         List<Toilet> toilets = restroomFeignClient.getAvailableToilet();
         if (CollectionUtils.isEmpty(toilets)) {
             throw new RuntimeException("shit in urinal");

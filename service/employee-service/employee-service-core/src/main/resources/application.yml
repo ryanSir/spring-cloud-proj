@@ -14,6 +14,14 @@ spring:
       probability: 1
       # 每秒最多采样100个trace
       rate: 100
+  zipkin:
+    sender:
+      type: web
+    discovery-client-enabled: true
+    base-url: http://zipkin-server
+    locator:
+      discovery:
+        enabled: true
   cloud:
     nacos:
       discovery:
@@ -69,10 +77,10 @@ ribbon:
 feign:
   compression:
     request:
-      enabled: true
-      min-request-size: 1024
+      enabled: false
+      min-request-size: 4096
     response:
-      enabled: true
+      enabled: false
 
 management:
   endpoint:
