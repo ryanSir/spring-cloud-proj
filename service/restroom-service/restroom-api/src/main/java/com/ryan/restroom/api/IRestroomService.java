@@ -17,4 +17,6 @@ public interface IRestroomService {
     Toilet release(Long id);
 
     boolean checkAvailability(Long id);
+
+    Toilet testZip(String input);
 }

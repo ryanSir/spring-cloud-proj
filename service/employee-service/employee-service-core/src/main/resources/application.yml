@@ -8,6 +8,12 @@ server:
 spring:
   application:
     name: employee-service
+  sleuth:
+    sampler:
+      #采样率 100%
+      probability: 1
+      # 每秒最多采样100个trace
+      rate: 100
   cloud:
     nacos:
       discovery:
@@ -39,14 +45,34 @@ spring:
 
 restroom-service:
   ribbon:
-    # 指定负载均衡策略
-    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+    # 指定负载均衡策略，细粒度配置，会覆盖全局配置
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+    ConnectTimeout: 1000 # 服务请求的连接超时时间
+    ReadTimeout: 2000 # 服务请求处理超时时间
+    # 注意 post put delete 确保幂等性
+    OkToRetryOnAllOperations: false # 是否对所有请求启动重试机制
+    MaxAutoRetries: 1 #每个实例重试次数
+    MaxAutoRetriesNextServer: 1 # 切换几个实例进行测试
 
-# 饥饿加载
+# 饥饿加载,全局配置
 ribbon:
   eager-load:
     enabled: true
     clients: restroom-service
+  ConnectTimeout: 1000 # 服务请求的连接超时时间
+  ReadTimeout: 1000 # 服务请求处理超时时间
+  # 注意 post put delete 确保幂等性
+  OkToRetryOnAllOperations: false # 是否对所有请求启动重试机制
+  MaxAutoRetries: 2 #每个实例重试次数
+  MaxAutoRetriesNextServer: 2 # 切换几个实例进行测试
+
+feign:
+  compression:
+    request:
+      enabled: true
+      min-request-size: 1024
+    response:
+      enabled: true
 
 management:
   endpoint:
@@ -59,3 +85,10 @@ management:
         include: '*'
   security:
     enabled: false
+
+logging:
+  level:
+    ROOT: info
+    com.ryan.employee.feign.RestroomFeignClient: debug
+  pattern:
+    dateformat: HH:mm:ss.SSS

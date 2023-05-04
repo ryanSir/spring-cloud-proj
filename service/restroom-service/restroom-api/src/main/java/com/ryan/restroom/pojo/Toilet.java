@@ -20,4 +20,7 @@ public class Toilet {
     private boolean clean;
 
     private boolean available;
+
+    // jst for test
+    private String  desc;
 }

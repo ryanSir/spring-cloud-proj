@@ -3,8 +3,10 @@ package com.ryan.employee.service;
 import com.ryan.employee.api.IEmployeeActivityService;
 import com.ryan.employee.dao.EmployeeActivityDAO;
 import com.ryan.employee.entity.EmployeeActivityEntity;
+import com.ryan.employee.feign.RestroomFeignClient;
 import com.ryan.employee.pojo.ActivityType;
 import com.ryan.employee.pojo.EmployeeActivity;
+import com.ryan.restroom.api.IRestroomService;
 import com.ryan.restroom.pojo.Toilet;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ArrayUtils;
@@ -12,7 +14,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.Resource;
+import javax.persistence.Id;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,10 +45,10 @@ public class EmployeeService implements IEmployeeActivityService {
     private EmployeeActivityDAO employeeActivityDAO;
 
     @Autowired
-    private RestTemplate        restTemplate;
-
-    @Autowired
     private DiscoveryClient     discoveryClient;
+
+    @Resource
+    private RestroomFeignClient restroomFeignClient;
 
     @Override
     @PostMapping("/toilet-break")
@@ -55,14 +61,13 @@ public class EmployeeService implements IEmployeeActivityService {
             throw new RuntimeException("快拉！");
         }
         // 发起远程调用
-        Toilet[] toilets = restTemplate.getForObject("http://restroom-service/toilet-service/checkAvailable/", Toilet[].class);
-        if (ArrayUtils.isEmpty(toilets)) {
+        //        Toilet[] toilets = restTemplate.getForObject("http://restroom-service/toilet-service/checkAvailable/", Toilet[].class);
+        List<Toilet> toilets = restroomFeignClient.getAvailableToilet();
+        if (CollectionUtils.isEmpty(toilets)) {
             throw new RuntimeException("shit in urinal");
         }
         // 抢坑
-        MultiValueMap<String, Object> args = new LinkedMultiValueMap<>();
-        args.add("id", toilets[0].getId());
-        Toilet toilet = restTemplate.postForObject("http://restroom-service/toilet-service/occupy", args, Toilet.class);
+        Toilet toilet = restroomFeignClient.occupy(toilets.get(0).getId());
 
         // 保存如厕记录
         EmployeeActivityEntity toiletBreak = EmployeeActivityEntity.builder().employeeId(employeeId).active(true).activityType(ActivityType.TOILET_BREAK).resourceId(toilet.getId())
@@ -83,9 +88,10 @@ public class EmployeeService implements IEmployeeActivityService {
             throw new RuntimeException("activity is no longer active");
         }
         // 释坑
-        MultiValueMap<String, Object> args = new LinkedMultiValueMap<>();
-        args.add("id", record.getResourceId());
-        Toilet toilet = restTemplate.postForObject("http://restroom-service/toilet-service/release", args, Toilet.class);
+        //        MultiValueMap<String, Object> args = new LinkedMultiValueMap<>();
+        //        args.add("id", record.getResourceId());
+        //        Toilet toilet = restTemplate.postForObject("http://restroom-service/toilet-service/release", args, Toilet.class);
+        restroomFeignClient.release(record.getResourceId());
         record.setActive(false);
         record.setEndTime(new Date());
         employeeActivityDAO.save(record);
@@ -95,8 +101,18 @@ public class EmployeeService implements IEmployeeActivityService {
         return result;
     }
 
-    @GetMapping("/testRibbon")
-    public void testRibbon() {
-        restTemplate.getForObject("http://restroom-service/toilet-service/checkAvailable/", Toilet[].class);
+    @GetMapping("/testFeign")
+    public void testFeign(Long count) {
+        restroomFeignClient.checkAvailability(count);
+    }
+
+    @GetMapping("/testZip")
+    public ResponseEntity<byte[]> testZip() {
+        log.info("test testZip,id={}", 2);
+        StringBuffer stringBuffer = new StringBuffer();
+        for (int i = 0; i < 2000; i++) {
+            stringBuffer.append(i);
+        }
+        return restroomFeignClient.testZip(stringBuffer.toString());
     }
 }

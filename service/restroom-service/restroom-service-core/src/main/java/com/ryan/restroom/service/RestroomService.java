@@ -62,8 +62,19 @@ public class RestroomService implements IRestroomService {
     @Override
     @GetMapping("/checkAvailability")
     public boolean checkAvailability(Long id) {
+        try {
+            Thread.sleep(id * 1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         ToiletEntity toilet = toiletDAO.findById(id).orElseThrow(() -> new RuntimeException("Toilet not found"));
         return toilet.isAvailable();
     }
 
+    @Override
+    @GetMapping("/testZip")
+    public Toilet testZip(String input) {
+        log.info("test testZip,id={}", 3);
+        return Toilet.builder().desc(input).build();
+    }
 }

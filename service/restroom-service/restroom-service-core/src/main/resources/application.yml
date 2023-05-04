@@ -1,5 +1,7 @@
 server:
   port: 30000
+  compression:
+    enabled: true
   error:
     includeException: true
     includeStacktrace: ON_PARAM
@@ -8,6 +10,13 @@ server:
 spring:
   application:
     name: restroom-service
+  sleuth:
+    sampler:
+      #采样率 100%
+      probability: 1
+      # 每秒最多采样100个trace
+      rate: 100
+
   cloud:
     nacos:
       discovery:
