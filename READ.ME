@@ -1,0 +1,16 @@
+docker pull sebp/elk
+docker run -p 5601:5601 -p 9200:9200 -p 5401:5401 -e ES_MIN_MEM=128m -e ES_MAX_MEM=1024m -itd --name elkfly sebp/elk
+/etc/logstash/conf.d/02-beats-input.conf
+将内容替换为
+input {
+    tcp {
+        port => 5044
+        codec => json_lines
+    }
+}
+output {
+    elasticsearch {
+        hosts => ["localhost:9200"]
+        index => "elkfly"
+    }
+}

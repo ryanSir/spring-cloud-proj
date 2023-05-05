@@ -18,3 +18,10 @@ zipkin:
 
 server:
   port: 30000
+
+
+management:
+  metrics:
+    web:
+      server:
+        auto-time-requests: false
