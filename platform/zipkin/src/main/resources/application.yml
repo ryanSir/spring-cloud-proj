@@ -8,5 +8,13 @@ spring:
     main:
       allow-bean-definition-overriding: true
 
+zipkin:
+  collector:
+    rabbitmq:
+      addresses: 20.50.54.194:5672
+      password: admin
+      username: admin
+      queue: zipkin
+
 server:
   port: 30000

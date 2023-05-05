@@ -16,12 +16,20 @@ spring:
       rate: 100
   zipkin:
     sender:
-      type: web
-    discovery-client-enabled: true
-    base-url: http://zipkin-server
-    locator:
-      discovery:
-        enabled: true
+      type: rabbit
+    rabbitmq:
+      queue: zipkin
+      addresses: 20.50.54.194:5672
+      password: admin
+      username: admin
+#    sender:
+#      type: web
+#    discovery-client-enabled: true
+#    base-url: http://zipkin-server
+#    locator:
+#      discovery:
+#        enabled: true
+
   cloud:
     nacos:
       discovery:
